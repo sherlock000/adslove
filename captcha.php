@@ -1,41 +1,42 @@
 <?php
- 
-//aktifkan session
 session_start();
+function randomPassword() {
+    $alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+   
+//remember to declare $pass as an array 
+$pass = array(); 
  
-header("Content-type: image/png");
+   //put the length -1 in cache
+    $alphaLength = strlen($alphabet) - 1; 
+    for ($i = 0; $i < 4; $i++) 
+    {
+        $n = rand(0, $alphaLength);
+        $pass[] = $alphabet[$n];
+    }
  
-// beri nama session dengan nama Captcha
-$_SESSION["Captcha"]="";
- 
-//tentukan ukuran gambar
-$gbr = imagecreate(200, 50);
- 
-//warna background gambar
-imagecolorallocate($gbr, 167, 218, 239);
- 
-$grey = imagecolorallocate($gbr, 128, 128, 128);
- 
-$black = imagecolorallocate($gbr, 0, 0,0);
- 
-// tentukan font
-$font = "monaco.ttf"; 
- 
-// membuat nomor acak dan ditampilkan pada gambar
-for($i=0;$i<=5;$i++) {
-	// jumlah karakter
-	$nomor=rand(0, 9);
- 
-	$_SESSION["Captcha"].=$nomor;
- 
-	$sudut= rand(-25, 25);
- 
-	imagettftext($gbr, 20, $sudut, 8+15*$i, 25, $black, 0, $nomor);
- 
-	// efek shadow
-	imagettftext ($gbr, 20, $sudut, 9+15*$i, 26, $grey, 0, $nomor);
+   //turn the array into a string
+    return implode($pass); 
 }
-//untuk membuat gambar 
-imagepng($gbr); 
-imagedestroy($gbr);
+ 
+$code=randomPassword();
+$_SESSION["code"]=$code;
+ 
+//height and width for captcha background
+$im = imagecreatetruecolor(100, 50);
+ 
+//background color blue
+$bg = imagecolorallocate($im, 22, 86, 165);
+ 
+//text color white
+$fg = imagecolorallocate($im, 255, 255, 255);
+imagefill($im, 0, 0, $bg);
+ 
+//( $image , $fontsize , $x-distance , $y-distance , $string , $fontcolor )
+imagestring($im, 5, 30, 15,  $code, $fg);
+ 
+//generate image
+header("Cache-Control: no-cache, must-revalidate");
+header('Content-type: image/png');
+imagepng($im);
+imagedestroy($im);
 ?>
